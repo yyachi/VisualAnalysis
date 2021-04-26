@@ -1,3 +1,20 @@
+load_config <- function(path){
+  config <- yaml.load_file(path)
+  if (!(Sys.getenv("MEDUSA_URL") == "")){
+    config$uri = Sys.getenv("MEDUSA_URL")
+  }
+  if (!(Sys.getenv("MEDUSA_USER") == "")){
+    config$user = Sys.getenv("MEDUSA_USER")
+  }
+  if (!(Sys.getenv("MEDUSA_PASSWORD") == "")){
+    config$password = Sys.getenv("MEDUSA_PASSWORD")
+  }
+  if (!(Sys.getenv("RDS_PATH") == "")){
+    config$RDS = Sys.getenv("RDS_PATH")
+  }
+  config
+}
+
 unproject <- function(x,y){
   d <- 180.0/pi
   R <- 6378137.0

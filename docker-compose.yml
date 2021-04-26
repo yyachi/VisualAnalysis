@@ -1,17 +1,55 @@
 version: "3.0"
-
+x-environment: &environment
+  http_proxy: http://172.25.1.137:9080/
+  https_proxy: http://172.25.1.137:9080/
+  HTTP_PROXY: http://172.25.1.137:9080/
+  HTTPS_PROXY: http://172.25.1.137:9080/
 services:
+  postgres:
+    image: postgres:9
+    container_name: visual_analysis_devel_postgres
+    networks:
+      - container-link
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  medusa:
+    container_name: visual_analysis_medusa
+    image: yyachi/medusa:latest-production
+    env_file: .env.medusa
+    environment:
+      <<: *environment
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    networks:
+      - container-link
+    command: bundle exec unicorn_rails -p 3000 -E production
+    ports:
+      - '3003:3000'
   shiny:
     container_name: visual_analysis
+    env_file: .env.shiny
     environment:
-      - PASSWORD=rstudi0
+      <<: *environment
+    depends_on:
+      - medusa
+    links:
+      - medusa
+    networks:
+      - container-link
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
-    # image: rocker/shiny
+    #image: rocker/shiny
+    image: yyachi/visual_analysis:latest
     build:
       context: .
+      args:
+        http_proxy: http://172.25.1.137:9080/
+        https_proxy: http://172.25.1.137:9080/
       dockerfile: Dockerfile
-    restart: always
     # Setting this to something other than 'root' will cause shiny apps not to
     # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
     # below.
@@ -31,9 +69,14 @@ services:
       - './lib:/srv/shiny-server/visual_analysis/lib'
       - './chelyabinsk:/srv/shiny-server/visual_analysis/chelyabinsk'
       - './map:/srv/shiny-server/visual_analysis/map'
-#      - './data:/srv/shiny-server/visual_analysis/data'
+      - './data:/srv/shiny-server/visual_analysis/data'
       - './:/home/rstudio/visual_analysis'
       # Comment the line below out for initial testing. With it commented out,
       # going to localhost:80 in one's web browser will show a "Welcome to
       # Shiny Server!" diagnostics page.
       # - './mountpoints/apps:/srv/shiny-server'
+volumes:
+  postgres_data:
+networks:
+  container-link:
+    name: visual_analysis_devel

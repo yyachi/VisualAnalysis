@@ -23,7 +23,8 @@ source("../lib/func.R")
 #global_id <- "20160820170853-707954"
 #global_id <- "20190115102242-432018"
 maxZoom <- 12
-config <- yaml.load_file("../config/medusa.yaml")
+#config <- yaml.load_file("../config/medusa.yaml")
+config <- load_config()
 con <- Connection$new(list(protocol=config$protocol, uri=config$uri, user=config$user, password=config$password))
 
 absPanel_plot <- absolutePanel(
