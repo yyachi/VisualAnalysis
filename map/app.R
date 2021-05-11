@@ -24,7 +24,8 @@ source("../lib/func.R")
 #global_id <- "20190115102242-432018"
 maxZoom <- 12
 #config <- yaml.load_file("../config/medusa.yaml")
-config <- load_config()
+config <- load_config("../config/medusa.yaml")
+
 con <- Connection$new(list(protocol=config$protocol, uri=config$uri, user=config$user, password=config$password))
 
 absPanel_plot <- absolutePanel(
@@ -183,7 +184,12 @@ server <- function(input, output, session) {
     if (!(is.null(id))){
       withProgress(message = paste('Getting', id), value = 0, {
         Record <- MedusaRClient::Resource$new("records", con)
-        record <- Record$find_by_global_id(id)
+        tryCatch({
+          cat(file=stderr(), paste("get object from [",config$uri,"]...\n",sep=""))
+          record <- Record$find_by_global_id(id)
+        },error= function(e){
+          print(e)
+        })
         incProgress(0.9)
       })
     }

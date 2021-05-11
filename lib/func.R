@@ -1,15 +1,20 @@
 load_config <- function(path){
+  cat(file=stderr(), paste("load_file from [",path,"]...\n",sep=""))
   config <- yaml.load_file(path)
   if (!(Sys.getenv("MEDUSA_URL") == "")){
+    cat(file=stderr(), paste("overwrite uri by [",Sys.getenv("MEDUSA_URL"),"]...\n",sep=""))
     config$uri = Sys.getenv("MEDUSA_URL")
   }
   if (!(Sys.getenv("MEDUSA_USER") == "")){
+    cat(file=stderr(), paste("overwrite user by [",Sys.getenv("MEDUSA_USER"),"]...\n",sep=""))
     config$user = Sys.getenv("MEDUSA_USER")
   }
   if (!(Sys.getenv("MEDUSA_PASSWORD") == "")){
+    cat(file=stderr(), paste("overwrite password by [",Sys.getenv("MEDUSA_PASSWORD"),"]...\n",sep=""))
     config$password = Sys.getenv("MEDUSA_PASSWORD")
   }
   if (!(Sys.getenv("RDS_PATH") == "")){
+    cat(file=stderr(), paste("overwrite RDS by [",Sys.getenv("RDS_PATH"),"]...\n",sep=""))
     config$RDS = Sys.getenv("RDS_PATH")
   }
   config

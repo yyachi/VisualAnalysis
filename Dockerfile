@@ -25,6 +25,7 @@ RUN apt-get update \
     protobuf-compiler \
     sqlite3 \
     tk-dev \
+    gettext-base \
     unixodbc-dev
 RUN R -e "source('https://bioconductor.org/biocLite.R')" \
 && install2.r --error \
